@@ -1,0 +1,165 @@
+
+table BankAccount {
+  account_number int [pk]
+  user_id int
+  balance int
+  activation_date timestamp
+  is_active boolean
+}
+
+ref: BankAccount.user_id > UserAccount.user_id
+
+table SavingData {
+  account_number int [pk]
+  profit_percentage int
+  type saving_type
+}
+
+enum saving_type{
+  deposit_account
+  money_market_account
+  certificate
+}
+
+ref: SavingData.account_number - BankAccount.account_number
+
+table UserAccount {
+  user_id int [pk, increment]
+  name varchar
+}
+
+table LegalAccount {
+  company_id int [pk]
+  user_id int 
+}
+
+table PhysicalAccount {
+  national_id int [pk]
+  user_id int 
+  signature varbinary
+  finger_print varbinary
+  family_name varcahr
+}
+
+ref: PhysicalAccount.user_id - UserAccount.user_id
+ref: LegalAccount.user_id - UserAccount.user_id
+
+
+table Transaction {
+  transaction_number int [pk]
+  amount int 
+  type transaction_type
+  date timestamp
+  description varchar
+  origin int 
+  destination int
+}
+
+ref: Transaction.origin > BankAccount.account_number 
+ref: Transaction.destination > BankAccount.account_number
+
+enum transaction_type {
+  Deposit
+  Transfer
+  Profit
+}
+
+table Loan {
+  loan_number int [pk, increment]
+  user_id int
+  amount int
+  status loan_status
+  start_date timestamp
+  end_date timestamp
+  remaining_number int
+  profit_percentage int
+  supervisor_id int 
+}
+
+ref: Loan.user_id > UserAccount.user_id
+ref: Loan.supervisor_id > Manager.Employee_num
+
+table Installment {
+  number int [pk]
+  loan_number int [pk]
+  data timestamp
+  amount int
+  status installment_status
+  transaction_number int [unique]
+}
+
+ref: Installment.loan_number > Loan.loan_number
+ref: Installment.transaction_number > Transaction.transaction_number
+
+
+enum installment_status {
+  paid
+  unpaid
+}
+
+enum loan_status {
+  requested
+  accepted
+  paid
+}
+
+Table Emploee {
+  Employee_num int [pk]
+  full_name varchar
+  type EMPLOYEE_TYPE
+ }
+ 
+Table Manager {
+  Employee_num int [pk]
+ }
+ Ref: Manager.Employee_num - Emploee.Employee_num
+ 
+  
+Table Activation_req {
+  user_id int [pk]
+  req_date timestamp [pk, unique]
+  is_accepted REQ_STATUS
+  Employee_num int
+ }
+ Ref: Activation_req.user_id > UserAccount.user_id
+ Ref: Activation_req.Employee_num > Emploee.Employee_num
+  
+Table bank_account_req {
+  user_id int [pk]
+  req_date timestamp [pk, unique]
+  is_accepted REQ_STATUS
+  balance int
+  is_saving boolean
+  profit_percentage int
+  type saving_type
+  Employee_num int
+}
+ Ref: bank_account_req.user_id > UserAccount.user_id
+ Ref: bank_account_req.Employee_num > Emploee.Employee_num
+  
+Table loan_req {
+  user_id int [pk]
+  req_date timestamp [pk, unique]
+  is_accepted REQ_STATUS
+  amount int
+  start_date timestamp
+  end_date timestamp
+  installment_number int
+  profit_percentage int
+  Manager_num int
+ }
+ Ref: loan_req.user_id > UserAccount.user_id
+ Ref: loan_req.Manager_num > Manager.Employee_num
+ //////////////////////////////
+ 
+ Enum EMPLOYEE_TYPE {
+  manager
+  normal_emploee
+}
+ Enum REQ_STATUS {
+ pending
+ accepted
+ declined
+}
+
+Ref: "loan_req"."user_id" < "loan_req"."is_accepted"

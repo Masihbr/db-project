@@ -1,0 +1,47 @@
+table Active_BankAccount_View {
+  owner_name varchar
+  account_number int 
+  balance int
+}
+
+table All_UserAccounts_View {
+  name varchar
+  user_id int
+}
+
+table All_BankAccounts_View {
+  owner_name varchar
+  user_id int
+  account_number int 
+  balance int 
+  activation_date datetime
+  is_active boolean
+}
+
+table Transactions_View {
+  transactions_number int 
+  origin_account int
+  origin_owner_name varchar
+  destination_account int  
+  destination_owner_name varchar
+  amount int 
+  type varchar
+  date datetime
+  description varchar
+}
+
+table All_Loans_View {
+  loan_number int 
+  owner_name varchar 
+  supervisor_id int 
+  owner_id int 
+  amount int 
+  status varchar 
+  start_date datetime
+  end_date datetime
+  remaining_amount int 
+  remaining_number int
+  profit_percentage int
+}
+
+
