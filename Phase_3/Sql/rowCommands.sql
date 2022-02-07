@@ -2,13 +2,13 @@
 INSERT INTO user_account
 VALUES (1, 'masih');
 INSERT INTO physical_account
-VALUES ("0024808629", 1, NULL, NULL, 'beigi');
+VALUES ('0024808629', 1, NULL, NULL, 'beigi');
 
 -- add logical account
 INSERT INTO user_account
 VALUES (10, 'bmw');
 INSERT INTO legal_account
-VALUES ("43221", 1, NULL, NULL, 'beigi');
+VALUES ('43221', 1);
 
 -- add employee
 INSERT INTO employee
@@ -16,9 +16,9 @@ VALUES (1, 'ali Lee', 'staff');
 
 -- add manager (???)
 INSERT INTO employee
-VALUES (1, 'Lee Te Pong', 'manager');
+VALUES (2, 'Lee Te Pong', 'manager');
 INSERT INTO manager
-VALUES (1);
+VALUES (2);
 
 -- add banck_account_req
 
@@ -30,22 +30,24 @@ VALUES (1, CURRENT_TIMESTAMP, DEFAULT, 100000, false, 10, 'deposit_account', 1);
 UPDATE bank_account_req
 SET "status" = 'accepted' 
 WHERE user_id = 1 AND req_date <= '2022-02-06 13:57:52.275892' AND req_date >= '2022-02-06 11:57:52.275892';
+-- trigger to create bank_acc (?)
 
 -- add bank_account
 
 INSERT INTO bank_account
-VALUES (1, 1, 100000, CURRENT_TIMESTAMP, true);
-INSERT INTO saving_data
-VALUES (1, 10, 'deposit_account');
+VALUES (1, 1, 100000, CURRENT_TIMESTAMP, true, 10, 'deposit_account');
+-- INSERT INTO saving_data
+-- VALUES (1, 10, 'deposit_account');
 
 -- get bank_account data (???)
 
-SELECT * FROM bank_account NATURAL JOIN saving_data;
+-- SELECT * FROM bank_account NATURAL JOIN saving_data;
 
 -- add transaction
 
 INSERT INTO "transaction"
-VALUES (DEFAULT, 10000, 'deposit', CURRENT_TIMESTAMP, NULL, 1, NULL);
+VALUES (DEFAULT, 10000, 'withdraw', CURRENT_TIMESTAMP, NULL, 1, NULL);
+-- trigger to check deposit has destination and withdraw has origin
 
 -- add activation_req
 
