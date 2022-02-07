@@ -38,42 +38,42 @@ CREATE OR REPLACE TRIGGER create_user_account_f
       EXECUTE PROCEDURE create_user_account(); 
 -----------------------------------------------------------
 -- activate account
-CREATE FUNCTION activate_account() 
+CREATE OR REPLACE FUNCTION activate_account() 
    RETURNS TRIGGER 
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
-   IF (NEW.status = "accepted" and NEW.employee_number IS NOT NULL) THEN
+   IF (NEW."status" = "accepted" and NEW.employee_number IS NOT NULL) THEN
       UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
    END IF;
 END;
 $$;
 
-CREATE TRIGGER activate_account_f
+CREATE OR REPLACE TRIGGER activate_account_f
    AFTER update ON activation_req
    FOR EACH ROW
-       EXECUTE PROCEDURE activate_account() 
+       EXECUTE PROCEDURE activate_account();
 -----------------------------------------------------------
 -- create bank account
-CREATE FUNCTION create_bank_account() 
+CREATE OR REPLACE FUNCTION create_bank_account() 
    RETURNS TRIGGER 
    LANGUAGE PLPGSQL
 AS $$
 DECLARE account_num INT;
 BEGIN
-   IF (NEW.status = "accepted" and NEW.employee_number IS NOT NULL) THEN
+   IF (NEW."status" = "accepted" and NEW.employee_number IS NOT NULL) THEN
       INSERT INTO bank_account VALUES(DEFAULT, NEW.user_id, NEW.balance, CURRENT_TIMESTAMP, TRUE, NEW.profit_percentage, NEW.type);
    END IF;  
 END;
 $$;
 
-CREATE TRIGGER create_bank_account_f
+CREATE OR REPLACE TRIGGER create_bank_account_f
    AFTER UPDATE ON bank_account_req
    FOR EACH ROW
-       EXECUTE PROCEDURE create_bank_account() 
+       EXECUTE PROCEDURE create_bank_account();
 -----------------------------------------------------------
 --create loan
-CREATE FUNCTION create_loan() 
+CREATE OR REPLACE FUNCTION create_loan() 
    RETURNS TRIGGER 
    LANGUAGE PLPGSQL
 AS $$
@@ -93,8 +93,8 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER create_loan_f
+CREATE OR REPLACE TRIGGER create_loan_f
    AFTER UPDATE ON loan_req
    FOR EACH ROW
-       EXECUTE PROCEDURE create_loan()
+       EXECUTE PROCEDURE create_loan();
 -----------------------------------------------------------
