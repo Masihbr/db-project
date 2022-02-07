@@ -1,4 +1,3 @@
-
 -- create user account
 CREATE OR REPLACE FUNCTION create_user_account() 
    RETURNS TRIGGER 
@@ -61,9 +60,8 @@ CREATE FUNCTION create_bank_account()
 AS $$
 DECLARE account_num INT;
 BEGIN
-   IF (NEW.status = "accepted" and NEW.Employee_num IS NOT NULL) THEN
-      INSERT INTO BankAccount VALUES(DEFAULT, NEW.user_id, NEW.balace, CURRENT_TIMESTAMP, "accepted") RETURNING account_number INTO account_num;
-      INSERT INTO SavingData VALUES(account_num, NEW.profit_percentage, NEW.type);
+   IF (NEW.status = "accepted" and NEW.employee_number IS NOT NULL) THEN
+      INSERT INTO bank_account VALUES(DEFAULT, NEW.user_id, NEW.balance, CURRENT_TIMESTAMP, TRUE, NEW.profit_percentage, NEW.type);
 END;
 $$
 
@@ -80,13 +78,13 @@ AS $$
 DECLARE loan_num INT;
         AMOUNT_Instalment INT;
 BEGIN
-   IF (NEW.is_accepted = "accepted" and NEW.Manager_num IS NOT NULL) THEN
-      INSERT INTO Loan VALUES(DEFAULT, NEW.user_id, NEW.amount, "accepted", new.start_date, new.end_date, installment_number, new.profit_percentage, new.supervisor_id) RETURNING loan_number INTO loan_num;
+   IF (NEW.status = "accepted" and NEW.manager_number IS NOT NULL) THEN
+      INSERT INTO loan VALUES(DEFAULT, NEW.user_id, NEW.amount, "accepted", new.start_date, new.end_date, NEW.instalment_number, NEW.profit_percentage, NEW.manager_number) RETURNING loan_number INTO loan_num;
       
-      AMOUNT_Instalment = (NEW.amount * NEW.profit_percentage) / NEW.installment_number
+      AMOUNT_Instalment = (NEW.amount * NEW.profit_percentage) / NEW.instalment_number
 
-      for r in 1..new.installment_number loop
-      INSERT INTO Instalment VALUES(DEFAULT, loan_num, NEW.start_date + interval '1 month' * (r - 1), AMOUNT_Instalment "UNPAID", NULL);
+      for r in 1..new.instalment_number loop
+      INSERT INTO Instalment VALUES(loan_num, DEFAULT, NEW.start_date + interval '1 month' * (r - 1), AMOUNT_Instalment "unpaid", NULL);
          end loop;
 
 END;
