@@ -4,7 +4,7 @@ CREATE VIEW top_transactions AS
     WHERE amount >= 1000000000;
 
     select *
-    from top_transactions
+    from top_transactions;
     --------------------------------------------
 CREATE OR REPLACE VIEW top_customers AS
     SELECT bank_account.user_id, user_account.name
@@ -15,22 +15,22 @@ CREATE OR REPLACE VIEW top_customers AS
     HAVING sum(balance)>= 1000000000;
     
     select *
-    from top_customers
+    from top_customers;
     --------------------------------------------
 CREATE OR REPLACE VIEW COMPANY_FULL_INFO AS
     SELECT user_account.user_id, "name", company_id
     FROM legal_account
     inner JOIN user_account
-    on user_account.user_id = legal_account.user_id
+    on user_account.user_id = legal_account.user_id;
     
     select *
-    from COMPANY_FULL_INFO
+    from COMPANY_FULL_INFO;
     --------------------------------------------
 CREATE OR REPLACE VIEW HUMAN_FULL_INFO AS
     SELECT national_id, user_account.user_id, user_account.name, family_name
     FROM physical_account
     inner JOIN user_account
-    on user_account.user_id = physical_account.user_id
+    on user_account.user_id = physical_account.user_id;
     
     select *
-    from HUMAN_FULL_INFO
+    from HUMAN_FULL_INFO;
