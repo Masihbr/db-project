@@ -1,1 +1,1 @@
-select employee_number from user_account;
+select employee_number from employee;

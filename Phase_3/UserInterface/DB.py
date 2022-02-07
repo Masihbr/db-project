@@ -25,8 +25,8 @@ class DB:
         return self.cursor.fetchall(), [desc[0] for desc in self.cursor.description]
 
     def do_query(self, query):
-        self.cursor.execute(query)
         try:
+            self.cursor.execute(query)
             self.connection.commit()
             print('Done Successful.')
         except psycopg2.OperationalError as e:
@@ -181,11 +181,44 @@ class DB:
         else:
             print('Invalid Command.')
 
+    def accept_bank_account(self, command):
+        match_object = re.match('^(\d+), \d\d\d\d/\d\d/\d\d, \d\d\d\d/\d\d/\d\d$', command)
+        if not match_object:
+            print('Invalid Input.')
+            return
+        user_id, req_date, req_date_prime = match_object.group().split(', ')
+        where_condition = f"user_id = {user_id} and req_date between '{req_date}' and '{req_date_prime}' and " \
+                          f"employee_number = {self.current_user} "
+        query_text = open('../Sql/queries/update_bank_account_req.sql').read()
+        query = query_text.format(condition=where_condition)
+        self.do_query(query)
+
+    def accept_activation(self, command):
+        match_object = re.match('^(\d+), \d\d\d\d/\d\d/\d\d, \d\d\d\d/\d\d/\d\d$', command)
+        if not match_object:
+            print('Invalid Input.')
+            return
+        user_id, req_date, req_date_prime = match_object.group().split(', ')
+        where_condition = f"user_id = {user_id} and req_date between '{req_date}' and '{req_date_prime}' and " \
+                          f"employee_number = {self.current_user} "
+        query_text = open('../Sql/queries/update_activation_req.sql').read()
+        query = query_text.format(condition=where_condition)
+        self.do_query(query)
+
     def has_account(self, account):
         query_text = open('../Sql/queries/view_bank_accounts.sql').read()
         query = query_text.format(condition=f'user_id = {self.current_user}')
         data, _ = self.get_output(query)
         return account in [x[0] for x in data]
 
+    def see_bank_account_req(self, command):
+        query_text = open('../Sql/queries/bank_request_view.sql').read()
+        query = query_text.format(condition=f'employee_number = {self.current_user}')
+        data, header = self.get_output(query)
+        print(tabulate(data, headers=header))
 
-
+    def see_activation_req(self, command):
+        query_text = open('../Sql/queries/activation_request_view.sql').read()
+        query = query_text.format(condition=f'employee_number = {self.current_user}')
+        data, header = self.get_output(query)
+        print(tabulate(data, headers=header))
