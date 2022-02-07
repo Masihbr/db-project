@@ -1,0 +1,1 @@
+select * from activation_req where {condition};

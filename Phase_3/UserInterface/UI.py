@@ -25,10 +25,10 @@ class View:
             i = 0
             for i, subview in enumerate(self.sub_views):
                 print(f'{i}. {subview.name}.')
-            print(f'{i+1}. Exit.')
+            print(f'{i + 1}. Exit.')
             print('------------------------')
             command = input()
-            if command != f'{i+1}':
+            if command != f'{i + 1}':
                 self.execute(int(command))
             else:
                 if self.father:
@@ -50,6 +50,20 @@ if __name__ == '__main__':
     employee_view = View('Employee Menu', father=first_view)
     manager_view = View('Manager', father=first_view)
 
+    # --------------------- employee view --------------------
+    bank_account_req_view = View('Bank Account Reqs', function=db.see_bank_account_req,
+                                 explanation='press enter', father=employee_view)
+    accept_bank_account_req = View('Accept Bank Reqs', function=db.accept_bank_account,
+                                   explanation='enter [user_id], [YYYY/MM/DD], [YYYY/MM/DD].', father=employee_view)
+    activation_req_view = View('Activation Reqs', function=db.see_activation_req,
+                               explanation='press enter', father=employee_view)
+    accept_activation_req = View('Accept Activation', function=db.accept_activation,
+                                 explanation='enter [user_id], [YYYY/MM/DD], [YYYY/MM/DD].', father=employee_view)
+
+    employee_view.add_view(activation_req_view)
+    employee_view.add_view(accept_activation_req)
+    employee_view.add_view(bank_account_req_view)
+    employee_view.add_view(accept_bank_account_req)
     # --------------------- User View ------------------------
     user_bank_accounts_view = View('My Bank Accounts', function=db.see_user_bank_accounts,
                                    explanation='press enter', father=user_view)
@@ -70,15 +84,16 @@ if __name__ == '__main__':
     user_view.add_view(user_withdraw)
     user_view.add_view(user_transfer)
     user_view.add_view(last_transactions_view)
-    # --------------------- Manager View ---------------------
+    # --------------------- First View ---------------------
     login_costumers_view = View('Login (Costumers)', function=db.login_user,
                                 explanation='Enter your id', father=first_view, next_menu=user_view)
     login_employee_view = View('Login (Employee)', function=db.login_employee,
-                               explanation='Enter your id', father=first_view)
+                               explanation='Enter your id', father=first_view, next_menu=employee_view)
 
     first_view.add_view(login_costumers_view)
     first_view.add_view(login_employee_view)
     first_view.add_view(manager_view)
+    # --------------------- Manager View ---------------------
 
     bank_account_view = View('Bank Accounts', function=db.see_all_bank_account,
                              explanation='type TRUE to sort ordered by balance', father=manager_view)
@@ -98,5 +113,3 @@ if __name__ == '__main__':
     manager_view.add_view(accept_request_view)
 
     first_view.show()
-
-
