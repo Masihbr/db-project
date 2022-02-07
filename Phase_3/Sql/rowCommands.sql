@@ -71,7 +71,7 @@ VALUES (1, 1, 100000, CURRENT_TIMESTAMP, true, 10, 'deposit_account');
 INSERT INTO "transaction"
 VALUES (DEFAULT, 777, 'withdraw', CURRENT_TIMESTAMP, NULL, 1, NULL);
 INSERT INTO "transaction"
-VALUES (DEFAULT, 777, 'transfer', CURRENT_TIMESTAMP, "Buying a Broken toy car.", 1, 2);
+VALUES (DEFAULT, 777, 'transfer', CURRENT_TIMESTAMP, 'Buying a Broken toy car.', 1, 2);
 INSERT INTO "transaction"
 VALUES (DEFAULT, 777, 'deposit', CURRENT_TIMESTAMP, NULL, NULL, 3);
 
@@ -82,14 +82,16 @@ VALUES (DEFAULT, 777, 'deposit', CURRENT_TIMESTAMP, NULL, NULL, 3);
 INSERT INTO activation_req
 VALUES (1, CURRENT_TIMESTAMP, 'declined', 1);
 
+INSERT INTO activation_req
+VALUES (1, CURRENT_TIMESTAMP, DEFAULT, 1);
+
 UPDATE activation_req
 SET "status" = 'accepted'
 WHERE user_id = 1;
 
 -- add loan_req
 
-INSERT INTO loan_req
-VALUES (1, CURRENT_TIMESTAMP, DEFAULT, 1000000, '2022-02-06', '2022-10-06', 8, 50, 2);
+
 
 -- add loan 
 
