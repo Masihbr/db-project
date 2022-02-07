@@ -7,6 +7,7 @@ CREATE TYPE saving_type AS ENUM (
 
 DROP TYPE IF EXISTS transaction_type;
 CREATE TYPE transaction_type AS ENUM (
+  'withdraw',
   'deposit',
   'transfer',
   'profit'
@@ -41,49 +42,51 @@ CREATE TYPE req_status AS ENUM (
 DROP TABLE IF EXISTS bank_account CASCADE;
 CREATE TABLE bank_account (
   "account_number" SERIAL PRIMARY KEY,
-  "user_id" int,
-  "balance" int,
-  "activation_date" timestamp,
-  "is_active" boolean
+  "user_id" INT,
+  "balance" INT CHECK ("balance" >= 0),
+  "activation_date" TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "is_active" BOOLEAN NOT NULL DEFAULT FALSE,
+  "profit_percentage" INT NOT NULL DEFAULT 0 CHECK ("profit_percentage" >= 0 AND "profit_percentage" <= 100), 
+  "type" saving_type NOT NULL
 );
 
-DROP TABLE IF EXISTS saving_data;
-CREATE TABLE saving_data (
-  "account_number" int PRIMARY KEY,
-  "profit_percentage" int,
-  "type" saving_type
-);
+-- DROP TABLE IF EXISTS saving_data;
+-- CREATE TABLE saving_data (
+--   "account_number" int PRIMARY KEY,
+--   "profit_percentage" int,
+--   "type" saving_type
+-- );
 
 DROP TABLE IF EXISTS user_account;
 CREATE TABLE user_account (
   "user_id" SERIAL PRIMARY KEY,
-  "name" varchar(50)
+  "name" VARCHAR(50) NOT NULL 
 );
 
 DROP TABLE IF EXISTS legal_account;
 CREATE TABLE legal_account (
-  "company_id" varchar(20) PRIMARY KEY, -- may start with zero
-  "user_id" int
+  "company_id" VARCHAR(20) PRIMARY KEY, -- may start with zero
+  "user_id" INT NOT NULL
 );
 
 DROP TABLE IF EXISTS physical_account;
 CREATE TABLE physical_account (
-  "national_id" varchar(20) PRIMARY KEY, -- may start with zero
-  "user_id" int,
-  "signature" varchar(200), -- address to file
-  "finger_print" varchar(200), -- address to file
-  "family_name" varchar(50)
+  "national_id" VARCHAR(20) PRIMARY KEY, -- may start with zero
+  "user_id" INT NOT NULL,
+  "signature" VARCHAR(200), -- address to file
+  "finger_print" VARCHAR(200), -- address to file
+  "family_name" VARCHAR(50) NOT NULL
 );
 
 DROP TABLE IF EXISTS "transaction";
 CREATE TABLE "transaction" (
   "transaction_number" SERIAL PRIMARY KEY,
-  "amount" INT,
-  "type" transaction_type,
-  "date" TIMESTAMP,
+  "amount" INT DEFAULT 0 CHECK ("amount" >= 0),
+  "type" transaction_type NOT NULL,
+  "date" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   "description" VARCHAR(200),
   "origin" INT,
-  "destination" INT
+  "destination" INT CHECK ("destination" IS NOT NULL OR "origin" IS NOT NULL)
 );
 
 -- trigger to check not both origin and destination are null - check type and nullness of origin and dest
@@ -91,23 +94,23 @@ CREATE TABLE "transaction" (
 DROP TABLE IF EXISTS loan;
 CREATE TABLE loan (
   "loan_number" SERIAL PRIMARY KEY,
-  "user_id" INT,
-  "amount" INT,
+  "user_id" INT NOT NULL,
+  "amount" INT NOT NULL CHECK ("amount" >= 0),
   "status" loan_status DEFAULT 'requested',
-  "start_date" TIMESTAMP,
-  "end_date" TIMESTAMP,
-  "remaining_number" INT,
-  "profit_percentage" INT,
+  "start_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "end_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "remaining_number" INT NOT NULL CHECK("remaining_number" >= 0),
+  "profit_percentage" INT NOT NULL CHECK("profit_percentage" >= 0),
   "supervisor_id" INT
 );
 
 DROP TABLE IF EXISTS instalment;
 CREATE TABLE instalment (
-  "loan_number" INT,
-  "number" SERIAL,
-  "date" TIMESTAMP,
-  "amount" INT,
-  "status" instalment_status DEFAULT 'unpaid',
+  "loan_number" INT NOT NULL,
+  "number" SERIAL NOT NULL CHECK ("number" > 0),
+  "date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "amount" INT NOT NULL CHECK ("amount" >= 0),
+  "status" instalment_status NOT NULL DEFAULT 'unpaid',
   "transaction_number" INT UNIQUE,
   PRIMARY KEY ("loan_number", "number")
 );
@@ -115,8 +118,8 @@ CREATE TABLE instalment (
 DROP TABLE IF EXISTS employee CASCADE;
 CREATE TABLE employee (
   "employee_number" SERIAL PRIMARY KEY,
-  "full_name" VARCHAR(100),
-  "type" employee_type
+  "full_name" VARCHAR(100) NOT NULL,
+  "type" employee_type NOT NULL DEFAULT 'staff'
 );
 
 DROP TABLE IF EXISTS manager CASCADE;
@@ -126,36 +129,36 @@ CREATE TABLE manager (
 
 DROP TABLE IF EXISTS activation_req;
 CREATE TABLE activation_req (
-  "user_id" INT,
-  "req_date" TIMESTAMP UNIQUE,
-  "status" req_status DEFAULT 'pending',
+  "user_id" INT NOT NULL,
+  "req_date" TIMESTAMP UNIQUE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "status" req_status NOT NULL DEFAULT 'pending',
   "employee_number" INT,
   PRIMARY KEY ("user_id", "req_date")
 );
 
 DROP TABLE IF EXISTS bank_account_req CASCADE;
 CREATE TABLE bank_account_req (
-  "user_id" INT,
-  "req_date" TIMESTAMP UNIQUE,
-  "status" req_status DEFAULT 'pending',
-  "balance" INT DEFAULT 0,
+  "user_id" INT NOT NULL,
+  "req_date" TIMESTAMP NOT NULL UNIQUE DEFAULT CURRENT_TIMESTAMP,
+  "status" req_status NOT NULL DEFAULT 'pending',
+  "balance" INT NOT NULL DEFAULT 0 CHECK ("balance" >= 0),
   "is_saving" BOOLEAN DEFAULT false,
-  "profit_percentage" INT,
-  "type" saving_type,
+  "profit_percentage" INT NOT NULL DEFAULT 0 CHECK ("profit_percentage" >= 0 AND "profit_percentage" <= 100),
+  "type" saving_type NOT NULL,
   "employee_number" INT,
   PRIMARY KEY ("user_id", "req_date")
 );
 
 DROP TABLE IF EXISTS loan_req;
 CREATE TABLE loan_req (
-  "user_id" INT,
-  "req_date" TIMESTAMP UNIQUE,
-  "status" req_status DEFAULT 'pending',
-  "amount" INT,
-  "start_date" TIMESTAMP,
-  "end_date" TIMESTAMP,
-  "instalment_number" INT,
-  "profit_percentage" INT,
+  "user_id" INT NOT NULL,
+  "req_date" TIMESTAMP NOT NULL UNIQUE DEFAULT CURRENT_TIMESTAMP,
+  "status" req_status NOT NULL DEFAULT 'pending',
+  "amount" INT NOT NULL DEFAULT 0 CHECK ("amount" >= 0),
+  "start_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "end_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "instalment_number" INT NOT NULL DEFAULT 0 CHECK ("instalment_number" >= 0),
+  "profit_percentage" INT NOT NULL DEFAULT 0 CHECK ("profit_percentage" >= 0 AND "profit_percentage" <= 100),
   "manager_number" INT,
   PRIMARY KEY ("user_id", "req_date")
 );
@@ -168,11 +171,11 @@ REFERENCES user_account ("user_id")
 ON DELETE RESTRICT
 ON UPDATE RESTRICT;
 
-ALTER TABLE saving_data 
-ADD FOREIGN KEY ("account_number") 
-REFERENCES bank_account ("account_number") 
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+-- ALTER TABLE saving_data 
+-- ADD FOREIGN KEY ("account_number") 
+-- REFERENCES bank_account ("account_number") 
+-- ON DELETE CASCADE
+-- ON UPDATE CASCADE;
 
 ALTER TABLE physical_account 
 ADD FOREIGN KEY ("user_id") 
