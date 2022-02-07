@@ -23,6 +23,9 @@ class DB:
         self.cursor.execute(query)
         return self.cursor.fetchall(), [desc[0] for desc in self.cursor.description]
 
+    def do_query(self, query):
+        self.cursor.execute(query)
+
     def see_all_bank_account(self, is_sort='FALSE'):
         is_sort = is_sort.capitalize() == 'True'
         query_text = open('../Sql/queries/view_all_bank_accounts.sql').read()
@@ -45,6 +48,38 @@ class DB:
         query = query_text.format(condition=condition)
         data, header = self.get_output(query)
         print(tabulate(data, headers=header))
+
+    def see_all_loan_request(self, command):
+        query_text = open('../Sql/queries/view_all_loan_request.sql').read()
+        query = query_text.format(condition='true')
+        data, header = self.get_output(query)
+        print(tabulate(data, headers=header))
+
+    def accept_loan(self, command):
+        match_object = re.match('^(\d+), \d\d\d\d/\d\d/\d\d, \d\d\d\d/\d\d/\d\d$', command)
+        if not match_object:
+            return
+        user_id, req_date, req_date_prime = match_object.group().split(', ')
+        where_condition = f"user_id = {user_id} and req_date between '{req_date}' and '{req_date_prime}'"
+        query_text = open('../Sql/queries/view_all_loan_request.sql').read()
+        query = query_text.format(condition=where_condition)
+        data, header = self.get_output(query)
+
+        if data:
+            query_text = open('../Sql/queries/accept_loan_req.sql').read()
+            values = data[0]
+            query = query_text.format(condition=where_condition, user_id=values[0], amount=values[3],
+                                      start_date=f"'{values[4].strftime('%x')}'", end_date=f"'{values[5].strftime('%x')}'", remaining_number=values[6],
+                                      profit_percentage=values[7], supervisor=values[8])
+            self.do_query(query)
+
+    def see_all_loans(self, command):
+        query_text = open('../Sql/queries/view_all_loans.sql').read()
+        query = query_text.format(condition='true')
+        data, header = self.get_output(query)
+        print(tabulate(data, headers=header))
+
+
 
 
 

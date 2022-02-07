@@ -1,0 +1,1 @@
+select * from loan_req where {condition};

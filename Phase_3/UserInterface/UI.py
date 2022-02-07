@@ -47,9 +47,18 @@ if __name__ == '__main__':
                              explanation='type TRUE to sort ordered by balance', father=manager_view)
     transaction_view = View('Transactions', function=db.see_all_transaction,
                             explanation='type None to get all or like YYYY/MM/DD, YYYY/MM/DD', father=manager_view)
+    loan_request_view = View('All loan requests', function=db.see_all_loan_request,
+                             explanation='press enter.', father=manager_view)
+    all_loans = View('All loans', function=db.see_all_loans,
+                     explanation='press enter.', father=manager_view)
+    accept_request_view = View('Accept request', function=db.accept_loan,
+                               explanation='enter [user_id], [YYYY/MM/DD], [YYYY/MM/DD].', father=manager_view)
 
     manager_view.add_view(bank_account_view)
     manager_view.add_view(transaction_view)
+    manager_view.add_view(loan_request_view)
+    manager_view.add_view(all_loans)
+    manager_view.add_view(accept_request_view)
 
     manager_view.show()
 
