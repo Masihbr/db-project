@@ -5,9 +5,6 @@ CREATE OR REPLACE FUNCTION create_user_account()
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
-<<<<<<< HEAD
-   INSERT INTO activation_req VALUES(NEW.user_id, CURRENT_TIMESTAMP, "pending", null);
-=======
    INSERT INTO activation_req 
    VALUES(NEW.user_id, CURRENT_TIMESTAMP, 'pending', 
    (SELECT employee_number
@@ -32,18 +29,12 @@ BEGIN
    LIMIT 1
    ));
    RETURN NEW;
->>>>>>> 215fc0f2a476e6adc9212d2a6b7b579e322219af
 END;
 $$;
 
-<<<<<<< HEAD
-CREATE TRIGGER create_user_account_f
-   AFTER OF INSERT ON user_account
-=======
 CREATE OR REPLACE TRIGGER create_user_account_f
    AFTER INSERT 
    ON user_account
->>>>>>> 215fc0f2a476e6adc9212d2a6b7b579e322219af
    FOR EACH ROW
       EXECUTE PROCEDURE create_user_account(); 
 -----------------------------------------------------------
