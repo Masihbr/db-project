@@ -1,18 +1,42 @@
 
 -- create user account
-CREATE FUNCTION create_user_account() 
+CREATE OR REPLACE FUNCTION create_user_account() 
    RETURNS TRIGGER 
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
-   INSERT INTO Activation_req VALUES(NEW.user_id, CURRENT_TIMESTAMP, "pending", null);
+   INSERT INTO activation_req 
+   VALUES(NEW.user_id, CURRENT_TIMESTAMP, 'pending', 
+   (SELECT employee_number
+   FROM employee
+   WHERE (SELECT COUNT(*) 
+          FROM activation_req 
+          WHERE activation_req."employee_number" = employee."employee_number") = 0 
+   OR 
+   (SELECT COUNT(*) 
+          FROM activation_req 
+          WHERE activation_req."employee_number" = employee."employee_number")
+          = (
+          SELECT MIN(myCount)
+          FROM (SELECT "employee_number", COUNT(*) as myCount
+                FROM activation_req
+                GROUP BY "employee_number") AS emp_count
+          )
+   ORDER BY (
+      CASE WHEN (SELECT COUNT(*) 
+                 FROM activation_req 
+                 WHERE activation_req."employee_number" = employee."employee_number") = 0 THEN 1 ELSE 2 END)
+   LIMIT 1
+   ));
+   RETURN NEW;
 END;
-$$
+$$;
 
-CREATE TRIGGER create_user_account_f
-   AFTER OF INSERT ON UserAccount
+CREATE OR REPLACE TRIGGER create_user_account_f
+   AFTER INSERT 
+   ON user_account
    FOR EACH ROW
-       EXECUTE PROCEDURE create_user_account() 
+      EXECUTE PROCEDURE create_user_account(); 
 -----------------------------------------------------------
 -- activate account
 CREATE FUNCTION activate_account() 
