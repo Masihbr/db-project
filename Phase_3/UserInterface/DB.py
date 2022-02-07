@@ -1,9 +1,11 @@
+import re
 import psycopg2
 from tabulate import tabulate
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
 
 class DB:
     HOST = os.getenv('HOST') or '127.0.0.1'
@@ -22,11 +24,29 @@ class DB:
         return self.cursor.fetchall(), [desc[0] for desc in self.cursor.description]
 
     def see_all_bank_account(self, is_sort='FALSE'):
-        is_sort = True if is_sort.capitalize() == 'TRUE' else 'FALSE'
-        if is_sort:
-            query = 'SELECT * FROM bank_account NATURAL JOIN saving_data ORDER BY balance DESC;'
-        else:
-            query = 'SELECT * FROM NATURAL JOIN saving_data bank_account;'
+        is_sort = is_sort.capitalize() == 'True'
+        query_text = open('../Sql/queries/view_all_bank_accounts.sql').read()
+        query = query_text.format(order_by=' ORDER BY balance DESC' if is_sort else '')
         data, header = self.get_output(query)
         print(tabulate(data, headers=header))
+
+    def see_all_transaction(self, command):
+        x = re.match('^\d\d\d\d/\d\d/\d\d, \d\d\d\d/\d\d/\d\d$', command)
+        if command == 'None':
+            condition = 'True'
+        elif not x:
+            return
+        else:
+            start_date, end_date = x.group().split(',')
+            start_date = start_date.strip()
+            end_date = end_date.strip()
+            condition = f"date between '{start_date}' and '{end_date}'"
+        query_text = open('../Sql/queries/view_all_transactions.sql').read()
+        query = query_text.format(condition=condition)
+        data, header = self.get_output(query)
+        print(tabulate(data, headers=header))
+
+
+
+
 
