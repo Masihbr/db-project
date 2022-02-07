@@ -1,13 +1,16 @@
 import psycopg2
 from tabulate import tabulate
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 class DB:
-    HOST = '127.0.0.1'
-    PORT = 5432
-    user = 'postgres'
-    database = 'db_project'
-    password = 'postgrespass'
+    HOST = os.getenv('HOST') or '127.0.0.1'
+    PORT = os.getenv('PORT') or '5432'
+    user = os.getenv('user') or 'postgres'
+    database = os.getenv('database') or 'db_project'
+    password = os.getenv('password') or 'postgrespass'
 
     def __init__(self):
         self.connection = psycopg2.connect(database=DB.database, user=DB.user, host=DB.HOST, port=DB.PORT,
