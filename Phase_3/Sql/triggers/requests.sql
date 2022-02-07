@@ -45,11 +45,12 @@ AS $$
 BEGIN
    IF (NEW.status = "accepted" and NEW.employee_number IS NOT NULL) THEN
       UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
+   END IF;
 END;
-$$
+$$;
 
 CREATE TRIGGER activate_account_f
-   AFTER OF update ON activation_req
+   AFTER update ON activation_req
    FOR EACH ROW
        EXECUTE PROCEDURE activate_account() 
 -----------------------------------------------------------
@@ -62,11 +63,12 @@ DECLARE account_num INT;
 BEGIN
    IF (NEW.status = "accepted" and NEW.employee_number IS NOT NULL) THEN
       INSERT INTO bank_account VALUES(DEFAULT, NEW.user_id, NEW.balance, CURRENT_TIMESTAMP, TRUE, NEW.profit_percentage, NEW.type);
+   END IF;  
 END;
-$$
+$$;
 
 CREATE TRIGGER create_bank_account_f
-   AFTER OF UPDATE ON bank_account_req
+   AFTER UPDATE ON bank_account_req
    FOR EACH ROW
        EXECUTE PROCEDURE create_bank_account() 
 -----------------------------------------------------------
@@ -81,17 +83,18 @@ BEGIN
    IF (NEW.status = "accepted" and NEW.manager_number IS NOT NULL) THEN
       INSERT INTO loan VALUES(DEFAULT, NEW.user_id, NEW.amount, "accepted", new.start_date, new.end_date, NEW.instalment_number, NEW.profit_percentage, NEW.manager_number) RETURNING loan_number INTO loan_num;
       
-      AMOUNT_Instalment = (NEW.amount * NEW.profit_percentage) / NEW.instalment_number
+      AMOUNT_Instalment = (NEW.amount * NEW.profit_percentage) / NEW.instalment_number;
 
       for r in 1..new.instalment_number loop
-      INSERT INTO Instalment VALUES(loan_num, DEFAULT, NEW.start_date + interval '1 month' * (r - 1), AMOUNT_Instalment "unpaid", NULL);
+      INSERT INTO Instalment VALUES(loan_num, DEFAULT, NEW.start_date + interval '1 month' * (r - 1), AMOUNT_Instalment, "unpaid", NULL);
          end loop;
+   END IF;
 
 END;
-$$
+$$;
 
 CREATE TRIGGER create_loan_f
-   AFTER OF UPDATE ON loan_req
+   AFTER UPDATE ON loan_req
    FOR EACH ROW
        EXECUTE PROCEDURE create_loan()
 -----------------------------------------------------------
