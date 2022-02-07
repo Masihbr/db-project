@@ -29,12 +29,6 @@ CREATE TRIGGER transaction_valid
     FOR EACH ROW
     EXECUTE PROCEDURE transaction_valid_func();
 
-CREATE TRIGGER trigger_name 
-   {BEFORE | AFTER | INSTEAD OF} { event }
-   ON table_name
-   [FOR [EACH] { ROW | STATEMENT }]
-       EXECUTE PROCEDURE trigger_function
-
 
 CREATE OR REPLACE FUNCTION transaction_success_func() 
    RETURNS TRIGGER 
