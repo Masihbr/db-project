@@ -1,6 +1,6 @@
 -- add physical account
 INSERT INTO user_account
-VALUES (1, 'masih');
+VALUES (1, 'masih', DEFAULT);
 INSERT INTO physical_account
 VALUES ('0024808629', 1, NULL, NULL, 'beigi');
 

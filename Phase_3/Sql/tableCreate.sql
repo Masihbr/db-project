@@ -60,7 +60,8 @@ CREATE TABLE bank_account (
 DROP TABLE IF EXISTS user_account;
 CREATE TABLE user_account (
   "user_id" SERIAL PRIMARY KEY,
-  "name" VARCHAR(50) NOT NULL 
+  "name" VARCHAR(50) NOT NULL, 
+  "is_active" NOT NULL DEFAULT FALSE
 );
 
 DROP TABLE IF EXISTS legal_account;
