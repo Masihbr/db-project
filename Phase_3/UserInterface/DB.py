@@ -5,9 +5,9 @@ from tabulate import tabulate
 class DB:
     HOST = '127.0.0.1'
     PORT = 5432
-    user = 'admin'
-    database = 'db'
-    password = 'db-course'
+    user = 'postgres'
+    database = 'db_project'
+    password = 'postgrespass'
 
     def __init__(self):
         self.connection = psycopg2.connect(database=DB.database, user=DB.user, host=DB.HOST, port=DB.PORT,

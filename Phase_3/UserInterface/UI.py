@@ -1,4 +1,4 @@
-from Phase_3 import DB
+from DB import DB
 
 
 class View:
@@ -38,7 +38,7 @@ class View:
 
 
 if __name__ == '__main__':
-    db = DB.DB()
+    db = DB()
     bank_account_view = View('Bank Accounts', function=db.see_all_bank_account,
                              explanation='type TRUE to sort ordered by balance')
     manager_view = View('Manager', sub_views=[bank_account_view])
