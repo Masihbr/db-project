@@ -43,9 +43,13 @@ CREATE OR REPLACE FUNCTION activate_account()
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
-   IF (NEW."status" = "accepted" and NEW.employee_number IS NOT NULL) THEN
+   IF (NEW."status" = 'accepted') THEN
       UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
    END IF;
+   IF (NEW."status" = 'accepted') THEN
+      UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
+   END IF;
+   RETURN NEW;
 END;
 $$;
 
@@ -61,9 +65,10 @@ CREATE OR REPLACE FUNCTION create_bank_account()
 AS $$
 DECLARE account_num INT;
 BEGIN
-   IF (NEW."status" = "accepted" and NEW.employee_number IS NOT NULL) THEN
+   IF (NEW."status" = 'accepted') THEN
       INSERT INTO bank_account VALUES(DEFAULT, NEW.user_id, NEW.balance, CURRENT_TIMESTAMP, TRUE, NEW.profit_percentage, NEW.type);
    END IF;  
+   RETURN NEW;
 END;
 $$;
 
@@ -80,7 +85,7 @@ AS $$
 DECLARE loan_num INT;
         AMOUNT_Instalment INT;
 BEGIN
-   IF (NEW.status = "accepted" and NEW.manager_number IS NOT NULL) THEN
+   IF (NEW.status = "accepted") THEN
       INSERT INTO loan VALUES(DEFAULT, NEW.user_id, NEW.amount, "accepted", new.start_date, new.end_date, NEW.instalment_number, NEW.profit_percentage, NEW.manager_number) RETURNING loan_number INTO loan_num;
       
       AMOUNT_Instalment = (NEW.amount * NEW.profit_percentage) / NEW.instalment_number;
@@ -89,7 +94,7 @@ BEGIN
       INSERT INTO Instalment VALUES(loan_num, DEFAULT, NEW.start_date + interval '1 month' * (r - 1), AMOUNT_Instalment, "unpaid", NULL);
          end loop;
    END IF;
-
+   RETURN NEW;
 END;
 $$;
 
