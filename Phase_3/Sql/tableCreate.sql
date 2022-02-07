@@ -131,7 +131,7 @@ CREATE TABLE manager (
 DROP TABLE IF EXISTS activation_req;
 CREATE TABLE activation_req (
   "user_id" INT NOT NULL,
-  "req_date" TIMESTAMP UNIQUE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "req_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "status" req_status NOT NULL DEFAULT 'pending',
   "employee_number" INT,
   PRIMARY KEY ("user_id", "req_date")
@@ -140,10 +140,9 @@ CREATE TABLE activation_req (
 DROP TABLE IF EXISTS bank_account_req CASCADE;
 CREATE TABLE bank_account_req (
   "user_id" INT NOT NULL,
-  "req_date" TIMESTAMP NOT NULL UNIQUE DEFAULT CURRENT_TIMESTAMP,
+  "req_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "status" req_status NOT NULL DEFAULT 'pending',
   "balance" INT NOT NULL DEFAULT 0 CHECK ("balance" >= 0),
-  "is_saving" BOOLEAN DEFAULT false,
   "profit_percentage" INT NOT NULL DEFAULT 0 CHECK ("profit_percentage" >= 0 AND "profit_percentage" <= 100),
   "type" saving_type NOT NULL,
   "employee_number" INT,
@@ -153,7 +152,7 @@ CREATE TABLE bank_account_req (
 DROP TABLE IF EXISTS loan_req;
 CREATE TABLE loan_req (
   "user_id" INT NOT NULL,
-  "req_date" TIMESTAMP NOT NULL UNIQUE DEFAULT CURRENT_TIMESTAMP,
+  "req_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "status" req_status NOT NULL DEFAULT 'pending',
   "amount" INT NOT NULL DEFAULT 0 CHECK ("amount" >= 0),
   "start_date" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

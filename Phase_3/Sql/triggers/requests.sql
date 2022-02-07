@@ -43,12 +43,10 @@ CREATE OR REPLACE FUNCTION activate_account()
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
-   IF (NEW."status" = 'accepted') THEN
+   IF (NEW."status" = 'accepted' and NEW.employee_number IS NOT NULL) THEN
       UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
    END IF;
-   IF (NEW."status" = 'accepted') THEN
-      UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
-   END IF;
+
    RETURN NEW;
 END;
 $$;
