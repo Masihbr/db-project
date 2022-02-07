@@ -6,7 +6,7 @@ VALUES ('0024808629', 1, NULL, NULL, 'beigi');
 
 -- add logical account
 INSERT INTO user_account
-VALUES (10, 'bmw');
+VALUES (10, 'bmw', DEFAULT);
 INSERT INTO legal_account
 VALUES ('43221', 1);
 
