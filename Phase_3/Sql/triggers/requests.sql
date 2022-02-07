@@ -43,9 +43,11 @@ CREATE OR REPLACE FUNCTION activate_account()
    LANGUAGE PLPGSQL
 AS $$
 BEGIN
-   IF (NEW."status" = "accepted" and NEW.employee_number IS NOT NULL) THEN
+   IF (NEW."status" = 'accepted' and NEW.employee_number IS NOT NULL) THEN
       UPDATE user_account SET is_active = TRUE WHERE user_account.user_id = NEW.user_id;
    END IF;
+
+   RETURN NEW;
 END;
 $$;
 
@@ -61,9 +63,10 @@ CREATE OR REPLACE FUNCTION create_bank_account()
 AS $$
 DECLARE account_num INT;
 BEGIN
-   IF (NEW."status" = "accepted" and NEW.employee_number IS NOT NULL) THEN
+   IF (NEW."status" = 'accepted' and NEW.employee_number IS NOT NULL) THEN
       INSERT INTO bank_account VALUES(DEFAULT, NEW.user_id, NEW.balance, CURRENT_TIMESTAMP, TRUE, NEW.profit_percentage, NEW.type);
-   END IF;  
+   END IF;
+   RETURN NEW;  
 END;
 $$;
 
